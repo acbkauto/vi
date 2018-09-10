@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="navigationdraweractivity_title">Vungle Integration DEMO</string>
+    <string name="navigationdraweractivity_description">This DEMO illustrates the look and feel of the integrated Vungle ads SDK. The basic drawer view educates user what planets look like. Tap on "Online Search" - icon magnifier triggers ads play view in next page.</string>
+</resources>
