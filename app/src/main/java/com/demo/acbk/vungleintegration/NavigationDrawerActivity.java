@@ -54,6 +54,8 @@ public class NavigationDrawerActivity extends Activity implements PlanetAdapter.
         mDrawerLayout=(DrawerLayout)findViewById(R.id.drawer_layout);
         mDrawerList=(RecyclerView)findViewById(R.id.left_drawer);
 
+        flexfeed_container=(RelativeLayout)findViewById(R.id.ffcontainer);
+
         /*
         // Set a custom shadow that overlays the main content when the drawer opens
         mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
@@ -141,6 +143,9 @@ public class NavigationDrawerActivity extends Activity implements PlanetAdapter.
                                 vungleNativeAd = Vungle.getNativeAd(placementsList.get(2), vunglePlayAdCallBack);
                                 nativeAdView = vungleNativeAd.renderNativeView();
                                 flexfeed_container.addView(nativeAdView);
+                                vungleNativeAd.finishDisplayingAd();
+                                flexfeed_container.removeView(nativeAdView);
+                                vungleNativeAd=null;
                             } else if (index == 1) {
                                 Vungle.playAd(placementsList.get(index), null, vunglePlayAdCallBack);
                             } else {
