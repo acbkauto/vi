@@ -3,19 +3,12 @@ package com.demo.acbk.vungleintegration;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.TextView;
-
-import com.vungle.warren.InitCallback;
-import com.vungle.warren.Vungle;
-
-import static com.demo.acbk.vungleintegration.VungleAds.LOG_TAG;
-import static com.demo.acbk.vungleintegration.VungleAds.app_id;
 
 /**
  * Launcher activity offering access to the Vungle Integration DEMO
@@ -29,6 +22,9 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Having a bridge to connect MainActive and class VungleAds
+        VungleAds adBridge = new VungleAds(this.getApplicationContext());
+
         // Prepare list of samples in dashboard view.
         mSamples = new Sample[]{
                 new Sample(R.string.navigationdraweractivity_title, R.string.navigationdraweractivity_description, NavigationDrawerActivity.class)
@@ -40,7 +36,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         mGridView.setOnItemClickListener(this);
 
         // Initialize Vungle SDK
-        initSDK();
+        adBridge.initSDK();
     }
 
     @Override
@@ -84,25 +80,5 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         private Sample(int titleResId, int descriptionResId, Class <? extends Activity> activityClass) {
             this(titleResId, descriptionResId, new Intent(MainActivity.this, activityClass));
         }
-    }
-
-    // Initialize Vungle SDK
-    public void initSDK() {
-        Vungle.init(app_id, getApplicationContext(), new InitCallback() {
-            @Override
-            public void onSuccess() {
-                Log.d(LOG_TAG, "InitCallback - Success");
-            }
-
-            @Override
-            public void onError(Throwable throwable) {
-                Log.d(LOG_TAG, "InitCallback - onError: "+throwable.getLocalizedMessage());
-            }
-
-            @Override
-            public void onAutoCacheAdAvailable(final String placementReferenceID) {
-                Log.d(LOG_TAG, "InitCallBack - onAutoCacheAdAvailable" + "\n\tPlacement Reference ID = " + placementReferenceID);
-            }
-        });
     }
 }

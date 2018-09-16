@@ -20,15 +20,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import com.vungle.warren.AdConfig;
-import com.vungle.warren.Vungle;
-import com.vungle.warren.VungleNativeAd;
-
 import java.util.Locale;
-
-import static com.demo.acbk.vungleintegration.VungleAds.placementsList;
-import static com.demo.acbk.vungleintegration.VungleAds.vungleLoadAdCallback;
-import static com.demo.acbk.vungleintegration.VungleAds.vunglePlayAdCallBack;
 
 public class NavigationDrawerActivity extends Activity implements PlanetAdapter.OnItemClickListener {
     private DrawerLayout mDrawerLayout;
@@ -39,10 +31,9 @@ public class NavigationDrawerActivity extends Activity implements PlanetAdapter.
     private CharSequence mTitle;
     private String[] mPlanetTitles;
 
-    private VungleNativeAd vungleNativeAd;
-    private View nativeAdView;
     private RelativeLayout flexfeed_container;
-    private AdConfig adConfig = new AdConfig();
+
+    private VungleAds adBridge;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +45,7 @@ public class NavigationDrawerActivity extends Activity implements PlanetAdapter.
         mDrawerLayout=(DrawerLayout)findViewById(R.id.drawer_layout);
         mDrawerList=(RecyclerView)findViewById(R.id.left_drawer);
 
+        adBridge = new VungleAds(this.getApplicationContext());
         flexfeed_container=(RelativeLayout)findViewById(R.id.ffcontainer);
 
         /*
@@ -122,41 +114,17 @@ public class NavigationDrawerActivity extends Activity implements PlanetAdapter.
         // Handle action buttons
         switch (item.getItemId()) {
             case R.id.action_websearch:
+
+                // Play ads here for ads played users
+                if (!adBridge.freePlay()) {
+                    adBridge.adOnAir(flexfeed_container);
+                }
+
                 // Create intent to perform web search for this planet
                 Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
                 intent.putExtra(SearchManager.QUERY, getActionBar().getTitle());
                 // Catch event that there is no activity to handle intent
                 if (intent.resolveActivity(getPackageManager()) != null) {
-
-                    // Play ads here for ads played users
-                    for (int i=0; i<3; i++) {
-
-                        final int index=i;
-
-                        if (Vungle.isInitialized() && index !=0) {
-                            Vungle.loadAd(placementsList.get(index), vungleLoadAdCallback);
-                        }
-
-                        if (Vungle.isInitialized() && Vungle.canPlayAd(placementsList.get(index))) {
-                            if (index == 2) {
-                                // Play Flex Feed ads
-                                vungleNativeAd = Vungle.getNativeAd(placementsList.get(2), vunglePlayAdCallBack);
-                                nativeAdView = vungleNativeAd.renderNativeView();
-                                flexfeed_container.addView(nativeAdView);
-                                vungleNativeAd.finishDisplayingAd();
-                                flexfeed_container.removeView(nativeAdView);
-                                vungleNativeAd=null;
-                            } else if (index == 1) {
-                                Vungle.playAd(placementsList.get(index), null, vunglePlayAdCallBack);
-                            } else {
-                                adConfig.setBackButtonImmediatelyEnabled(true);
-                                adConfig.setAutoRotate(true);
-                                adConfig.setMuted(false);
-                                Vungle.setIncentivizedFields("Test", "Title", "msgBody", "keepWatching", "RewardedClose");
-                                Vungle.playAd(placementsList.get(index), adConfig, vunglePlayAdCallBack);
-                            }
-                        }
-                    }
 
                     // Web Search intent
                     startActivity(intent);
@@ -246,19 +214,6 @@ public class NavigationDrawerActivity extends Activity implements PlanetAdapter.
 
             getActivity().setTitle(planet);
             return rootView;
-        }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if (vungleNativeAd != null) {
-            vungleNativeAd.setAdVisibility(false);
         }
     }
 }
